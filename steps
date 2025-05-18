@@ -1,0 +1,299 @@
+Below is a **component-by-component recipe** for building the Apple TV+ landing screen in **Kotlin + Jetpack Compose** using modern APIs and best practices.
+
+---
+
+## 0  Project bootstrap
+
+1. **Gradle**
+   * Compose BOM 2025.05 - `platform("androidx.compose:compose-bom:2025.05.00")`
+   * Material 3 - `androidx.compose.material3:material3`
+   * Foundation (includes Pager) - `androidx.compose.foundation:foundation`
+   * Coil 3 - `io.coil-kt.coil3:coil-compose:3.2.0`
+   
+2. **Theme default** ➜ dark mode **only** (Surface = #000000) – layer soft whites on top
+3. **Fonts** – drop *SF Pro Display* (*w400, w600*) into `font/`; reference in `Typography`
+
+---
+
+## 1  Root layout & Edge-to-Edge
+
+1. **Enable Edge-to-Edge**:
+   ```kotlin
+   // In MainActivity
+   WindowCompat.setDecorFitsSystemWindows(window, false)
+   ```
+
+2. **Scaffold with TopAppBar and BottomNav**:
+   ```kotlin
+   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+   
+   Scaffold(
+       topBar = {
+           CenterAlignedTopAppBar(
+               title = { /* Logo */ },
+               scrollBehavior = scrollBehavior
+           )
+       },
+       bottomBar = { BottomNavBar() }
+   ) { innerPadding → LazyColumn(contentPadding = innerPadding) { /* content */ } }
+   ```
+
+---
+
+## 2  Status-bar & system insets
+
+Use modern **Material 3 `WindowInsets` utilities**:
+
+```kotlin
+// Apply to specific content
+Modifier.windowInsetsPadding(WindowInsets.statusBars)
+
+// Use with navigation bar
+NavigationBar(
+    windowInsets = WindowInsets.navigationBars // automatic handling
+)
+```
+
+---
+
+## 3  Hero section with Pager
+
+```kotlin
+val pagerState = rememberPagerState { posters.size }
+
+Box(modifier = Modifier.height(330.dp)) {
+    // Use foundation Pager instead of Accompanist
+    HorizontalPager(
+        state = pagerState,
+        beyondBoundsPageCount = 1 // Pre-load for smooth scrolling
+    ) { page -> 
+        // Use Coil 3 AsyncImage
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(poster.imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "${poster.title} poster",
+            contentScale = ContentScale.FillBounds // Better performance
+        )
+    }
+    
+    // Gradient scrim for text legibility
+    Box(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .background(Brush.verticalGradient(
+                0.6f to Color.Transparent,
+                1f to Color.Black
+            ))
+    )
+    
+    // Overlay content with logo and sign-in
+    Row(
+        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+    ) {
+        Text("Apple TV+") 
+        Spacer(Modifier.weight(1f)) 
+        SignInButton()
+    }
+}
+```
+
+---
+
+## 4  Call-to-action block (CTA)
+
+```kotlin
+Column(Modifier.padding(horizontal = 24.dp)) {
+    Text(
+        "Watch on the Apple TV app",
+        style = MaterialTheme.typography.headlineSmall
+    )
+    
+    Text(
+        "Enjoy all Apple Originals — only on Apple TV+",
+        style = MaterialTheme.typography.bodyMedium.copy(alpha = 0.7f)
+    )
+    
+    Button(
+        onClick = { /* action */ },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+    ) { Text("Try It Free", color = Color.Black) }
+    
+    Text(
+        "3 months free, then $9.99/month",
+        style = MaterialTheme.typography.bodySmall.copy(alpha = 0.6f)
+    )
+}
+```
+
+---
+
+## 5  Pager indicators (dots)
+
+```kotlin
+Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.Center
+) {
+    repeat(pageCount) { idx ->
+        Box(
+            Modifier
+                .padding(horizontal = 4.dp)
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(
+                    if (idx == currentPage) Color.White else Color(0xFF444444)
+                )
+        )
+    }
+}
+```
+
+---
+
+## 6  Section header row
+
+```kotlin
+Row(
+    Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Text(
+        title,
+        style = MaterialTheme.typography.titleMedium
+    )
+    Spacer(Modifier.weight(1f))
+    Icon(Icons.Rounded.ChevronRight, null)
+}
+```
+
+---
+
+## 7  Horizontal card carousel
+
+```kotlin
+LazyRow(
+    contentPadding = PaddingValues(horizontal = 16.dp),
+    horizontalArrangement = Arrangement.spacedBy(12.dp)
+) {
+    items(shows, key = ShowItem::id) { show ->
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(show.imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "${show.title} poster",
+            modifier = Modifier
+                .size(170.dp, 250.dp)
+                .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+```
+
+---
+
+## 8  Bottom navigation bar
+
+```kotlin
+NavigationBar(
+    containerColor = Color.Black,
+    tonalElevation = 0.dp, // Flat appearance
+    // WindowInsets.navigationBars handled automatically
+) {
+    items.forEach { item ->
+        NavigationBarItem(
+            selected = currentRoute == item.route,
+            onClick = { /* Navigate */ },
+            icon = { Icon(item.icon, contentDescription = null) },
+            label = { Text(item.title) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.White,
+                unselectedIconColor = Color(0xFF8A8A8A)
+            )
+        )
+    }
+}
+```
+
+---
+
+## 9  Grid sections
+
+```kotlin
+// For New Releases or grid layouts
+LazyVerticalGrid(
+    columns = GridCells.Fixed(3),
+    contentPadding = PaddingValues(horizontal = 16.dp),
+    horizontalArrangement = Arrangement.spacedBy(12.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp)
+) {
+    items(gridItems) { item -> ShowCard(item) }
+}
+```
+
+---
+
+## 10  Performance optimizations
+
+1. **Avoid overdraw**:
+   ```kotlin
+   Modifier.graphicsLayer { compositingStrategy = CompositingStrategy.Auto }
+   ```
+
+2. **Image caching & pre-loading**:
+   * Use `beyondBoundsPageCount = 1` for pre-composition
+   * Coil 3 caches to disk by default
+   
+3. **Use `ContentScale.FillBounds`** for poster images
+
+---
+
+## 11  Extended sections (post-hero feed)
+
+1. **Define section types** for reuse:
+   ```kotlin
+   sealed class HomeSection(val title: String, val showChevron: Boolean = true) {
+       data object HorizontalRail : HomeSection("Movie Spotlight")
+       data object Top10Shows : HomeSection("Top 10 TV Shows")
+       // More sections as needed...
+   }
+   ```
+
+2. **Top 10 sections** with ranking overlay, using Box:
+   ```kotlin
+   Box {
+       AsyncImage(model = show.posterUrl)
+       Text(
+           "${index + 1}",
+           style = MaterialTheme.typography.displayLarge,
+           modifier = Modifier.align(Alignment.BottomStart)
+       )
+   }
+   ```
+
+3. **Coming Soon cards** with wider aspect ratio (~2:1)
+4. **Full-width hero** with caption overlays for featured content
+
+---
+
+### Deliverable hierarchy
+
+```
+ui/
+ ├─ screen/HomeScreen.kt
+ ├─ component/HeroCollage.kt
+ ├─ component/CtaSection.kt
+ ├─ component/PageIndicator.kt
+ ├─ component/SectionHeader.kt
+ ├─ component/ShowCard.kt
+ └─ navigation/BottomNavBar.kt
+```
+
+This implementation uses the latest Jetpack Compose and Material 3 APIs for a modern, future-proof implementation that survives version upgrades.
+
+
