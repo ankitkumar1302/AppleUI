@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
+import androidx.compose.ui.tooling.preview.Preview
+import com.ankit.appleui.ui.theme.AppleUITheme
+import com.ankit.appleui.ui.util.ImageResources
 
 data class ShowItem(
     val id: String,
@@ -83,4 +86,12 @@ fun ShowCard(
             }
         }
     }
-} 
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun ShowCardPreview() {
+    AppleUITheme {
+        ShowCard(show = ImageResources.getShowItem(0))
+    }
+}
