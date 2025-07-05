@@ -30,6 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.pager.rememberPagerState
+import com.ankit.appleui.ui.theme.AppleUITheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -152,4 +155,13 @@ fun AppleTVStyleIndicator(
             )
         }
     }
-} 
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun CtaSectionPreview() {
+    AppleUITheme {
+        val pagerState = rememberPagerState { 5 }
+        CtaSection(pagerState = pagerState)
+    }
+}
