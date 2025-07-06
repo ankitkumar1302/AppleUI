@@ -55,9 +55,12 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    
+
     // Material 3
     implementation(libs.androidx.material3)
+
+    // Navigation Compose
+    implementation(libs.androidx.navigation.compose)
     
     // Foundation (includes Pager - replaces Accompanist pager)
     implementation("androidx.compose.foundation:foundation")

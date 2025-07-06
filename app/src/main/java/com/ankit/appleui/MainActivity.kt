@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.ankit.appleui.ui.screen.HomeScreen
+import com.ankit.appleui.ui.navigation.AppNavHost
 import com.ankit.appleui.ui.theme.AppleUITheme
 
 class MainActivity : ComponentActivity() {
@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    AppNavHost()
                 }
             }
         }

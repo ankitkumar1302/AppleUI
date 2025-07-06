@@ -64,13 +64,12 @@ import com.ankit.appleui.ui.component.CtaSection
 import com.ankit.appleui.ui.component.HeroCollage
 import com.ankit.appleui.ui.component.SectionHeader
 import com.ankit.appleui.ui.component.ShowCard
-import com.ankit.appleui.ui.navigation.BottomNavBar
 import com.ankit.appleui.ui.util.ImageResources
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onShowClick: (String) -> Unit) {
     val listState = rememberLazyListState()
     val pagerState = rememberPagerState { 5 }
     val coroutineScope = rememberCoroutineScope()
@@ -116,10 +115,6 @@ fun HomeScreen() {
         Scaffold(
             containerColor = Color.Black,
             contentColor = Color.White,
-            bottomBar = {
-                // Custom bottom navigation bar
-                BottomNavBar()
-            },
             topBar = {
                 // Only show the top app bar when scrolled down
                 AnimatedVisibility(
@@ -233,7 +228,8 @@ fun HomeScreen() {
                     ) {
                         items(shows) { show ->
                             ShowCard(
-                                show = show
+                                show = show,
+                                onClick = { onShowClick(show.id) }
                             )
                         }
                     }
@@ -254,7 +250,8 @@ fun HomeScreen() {
                     ) {
                         items(topShows) { show ->
                             ShowCard(
-                                show = show
+                                show = show,
+                                onClick = { onShowClick(show.id) }
                             )
                         }
                     }
@@ -275,7 +272,8 @@ fun HomeScreen() {
                     ) {
                         items(comingSoonShows) { show ->
                             ShowCard(
-                                show = show
+                                show = show,
+                                onClick = { onShowClick(show.id) }
                             )
                         }
                     }
