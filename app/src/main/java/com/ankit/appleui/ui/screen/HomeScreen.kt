@@ -1,17 +1,13 @@
 package com.ankit.appleui.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,11 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -31,60 +24,46 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.core.view.WindowInsetsCompat
 import com.ankit.appleui.ui.component.CtaSection
 import com.ankit.appleui.ui.component.HeroCollage
 import com.ankit.appleui.ui.component.SectionHeader
 import com.ankit.appleui.ui.component.ShowCard
 import com.ankit.appleui.ui.util.ImageResources
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(onShowClick: (String) -> Unit) {
     val listState = rememberLazyListState()
     val pagerState = rememberPagerState { 5 }
-    val coroutineScope = rememberCoroutineScope()
     
-    // For collapsing toolbar behavior
-    val topAppBarState = rememberTopAppBarState()
-    
-    // Show top app bar only when scrolled
-    val showTopBar by remember {
+    // Determine if content should appear in the top bar based on scroll position
+    val showTopBarContent by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 150 }
     }
-    
-    // Variable to indicate if title/signin should be shown in hero or appbar
+
+    // Show controls in the hero section only when the top bar content is hidden
     val showInHero by remember {
-        derivedStateOf { !showTopBar }
+        derivedStateOf { !showTopBarContent }
     }
     
     // Get status bar height
@@ -95,7 +74,7 @@ fun HomeScreen(onShowClick: (String) -> Unit) {
     
     // Animate the status bar background alpha
     val statusBarBackgroundAlpha by animateFloatAsState(
-        targetValue = if (showTopBar) 1f else 0f,
+        targetValue = if (showTopBarContent) 1f else 0f,
         animationSpec = tween(durationMillis = 300),
         label = "statusBarAlpha"
     )
@@ -116,34 +95,27 @@ fun HomeScreen(onShowClick: (String) -> Unit) {
             containerColor = Color.Black,
             contentColor = Color.White,
             topBar = {
-                // Only show the top app bar when scrolled down
-                AnimatedVisibility(
-                    visible = showTopBar,
-                    enter = fadeIn(animationSpec = tween(300)) + 
-                            slideInVertically(
-                                animationSpec = tween(300),
-                                initialOffsetY = { -it }
-                            ),
-                    exit = fadeOut(animationSpec = tween(300)) + 
-                        slideOutVertically(
-                                animationSpec = tween(300),
-                                targetOffsetY = { -it }
-                        )
-                ) {
-                    CenterAlignedTopAppBar(
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = Color.Black,
-                            titleContentColor = Color.White
-                        ),
-                        title = {
+                val topBarColor by animateColorAsState(
+                    targetValue = if (showTopBarContent) Color.Black else Color.Transparent,
+                    label = "topBarColor"
+                )
+
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = topBarColor,
+                        titleContentColor = Color.White
+                    ),
+                    title = {
+                        AnimatedVisibility(showTopBarContent) {
                             Text(
                                 text = "Apple TV+",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
-                        },
-                        actions = {
-                            // Sign In Button
+                        }
+                    },
+                    actions = {
+                        AnimatedVisibility(showTopBarContent) {
                             IconButton(onClick = { /* Sign in action */ }) {
                                 Icon(
                                     Icons.Default.Person,
@@ -151,10 +123,10 @@ fun HomeScreen(onShowClick: (String) -> Unit) {
                                     tint = Color.White
                                 )
                             }
-                        },
-                        modifier = Modifier.statusBarsPadding()
-                    )
-                }
+                        }
+                    },
+                    modifier = Modifier.statusBarsPadding()
+                )
             }
         ) { innerPadding ->
             // Main scrollable content
