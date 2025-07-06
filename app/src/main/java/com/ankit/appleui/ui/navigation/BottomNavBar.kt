@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.ankit.appleui.ui.theme.AppleUITheme
 
 sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object AppleTVPlus : BottomNavItem("Apple TV+", Icons.Filled.Home)
@@ -82,4 +84,12 @@ fun BottomNavBar() {
             )
         }
     }
-} 
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun BottomNavBarPreview() {
+    AppleUITheme {
+        BottomNavBar()
+    }
+}

@@ -40,6 +40,9 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.ankit.appleui.ui.util.ImageResources
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.ui.tooling.preview.Preview
+import com.ankit.appleui.ui.theme.AppleUITheme
 
 // Sample data for hero posters
 data class PosterItem(val id: String, val imageUrl: String, val title: String)
@@ -181,4 +184,13 @@ fun HeroCollage(
                 .zIndex(2f) // Above the hero image but below indicators
         )
     }
-} 
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun HeroCollagePreview() {
+    AppleUITheme {
+        val pagerState = rememberPagerState { heroPosters.size }
+        HeroCollage(pagerState = pagerState)
+    }
+}
