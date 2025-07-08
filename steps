@@ -23,19 +23,15 @@ Below is a **component-by-component recipe** for building the Apple TV+ landing 
    WindowCompat.setDecorFitsSystemWindows(window, false)
    ```
 
-2. **Scaffold with TopAppBar and BottomNav**:
+2. **Scaffold with BottomNav**:
    ```kotlin
-   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-   
    Scaffold(
-       topBar = {
-           CenterAlignedTopAppBar(
-               title = { /* Logo */ },
-               scrollBehavior = scrollBehavior
-           )
-       },
        bottomBar = { BottomNavBar() }
-   ) { innerPadding → LazyColumn(contentPadding = innerPadding) { /* content */ } }
+   ) { innerPadding →
+       LazyColumn(contentPadding = innerPadding) {
+           /* content */
+       }
+   }
    ```
 
 ---

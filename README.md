@@ -24,7 +24,6 @@
 2. **Hero Section**: Beautiful hero carousel with animated transitions and Apple TV+ style dot indicators
 3. **Call-to-Action Section**: Clean, minimal CTA section with subscription details and trial button
 4. **Content Carousels**: Horizontal scrolling content sections for Movies, TV Shows and other categories
-5. **Animated TopAppBar**: The top app bar appears and disappears based on scroll position
 
 ## Screenshots 📸
 
