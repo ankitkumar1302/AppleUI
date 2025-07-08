@@ -16,21 +16,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -93,41 +86,7 @@ fun HomeScreen(onShowClick: (String) -> Unit) {
         // Main content scaffold
         Scaffold(
             containerColor = Color.Black,
-            contentColor = Color.White,
-            topBar = {
-                val topBarColor by animateColorAsState(
-                    targetValue = if (showTopBarContent) Color.Black else Color.Transparent,
-                    label = "topBarColor"
-                )
-
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = topBarColor,
-                        titleContentColor = Color.White
-                    ),
-                    title = {
-                        AnimatedVisibility(showTopBarContent) {
-                            Text(
-                                text = "Apple TV+",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    },
-                    actions = {
-                        AnimatedVisibility(showTopBarContent) {
-                            IconButton(onClick = { /* Sign in action */ }) {
-                                Icon(
-                                    Icons.Default.Person,
-                                    contentDescription = "Sign In",
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                    },
-                    modifier = Modifier.statusBarsPadding()
-                )
-            }
+            contentColor = Color.White
         ) { innerPadding ->
             // Main scrollable content
             LazyColumn(
